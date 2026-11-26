@@ -9,14 +9,16 @@ from alembic import context
 
 sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), "..")))
 
-from app.core.database import Base, DATABASE_URL
-from app.models import models
+from app.core.database import Base, get_database_url
+from app import models  # Register table models exported by app.models.
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+# ConfigParser treats percent signs as interpolation markers. URLs may contain
+# percent-encoded passwords, so preserve literal percent signs here.
+config.set_main_option("sqlalchemy.url", get_database_url().replace("%", "%%"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
